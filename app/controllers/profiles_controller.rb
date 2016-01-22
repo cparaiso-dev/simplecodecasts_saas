@@ -18,6 +18,6 @@ class ProfilesController < ApplicationController
    
    private
    def profile_params # whitelist input data from 'new' page submit action
-    params.require(:profile).permit(:first_name, :last_name, :job_title, :phone_nuber, :contact_email, :description)
+    params.require(:profile).permit(:first_name, :last_name, :job_title, :phone_number, :contact_email, :description)
    end
 end
