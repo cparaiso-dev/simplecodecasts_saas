@@ -1,11 +1,14 @@
 class ProfilesController < ApplicationController
-   def new
+    before_action :authenticate_user!
+    before_action :only_current_user
+    
+    def new
        # display form where a user can fill out their own profile
        @user = User.find( params[:user_id] )
        @profile = Profile.new
-   end
-   
-   def create
+    end
+    
+    def create
        @user = User.find(params[:user_id])
        @profile = @user.build_profile( profile_params ) # build profile based on whitelisted data passed from the new page 
        if @profile.save
@@ -14,15 +17,31 @@ class ProfilesController < ApplicationController
        else
            render action: :new
        end
-   end
-   
-   def edit
+    end
+    
+    def edit
        @user = User.find( params[:user_id] )
        @profile = @user.profile
-   end
-   
-   private
-   def profile_params # whitelist input data from 'new' page submit action
+    end
+    
+    def update
+       @user = User.find( params[:user_id] )
+       @profile = @user.profile
+       if @profile.update_attributes(profile_params)
+           flash[:success] = "Profile Updated!"
+           redirect_to user_path( params[:user_id] )
+       else
+           render action: :edit
+       end
+    end
+    
+    private
+    def profile_params # whitelist input data from 'new' page submit action
     params.require(:profile).permit(:first_name, :last_name, :job_title, :phone_number, :contact_email, :description)
-   end
+    end
+    
+    def only_current_user
+        @user = User.find( params[:user_id] )
+        redirect_to(root_url) unless @user == current_user
+    end
 end
